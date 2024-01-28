@@ -1,24 +1,32 @@
 package com.project;
 
 import javax.persistence.*;
+
+import java.util.List;
 import java.util.Set;
 
 @Entity
 public class Persona {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "persona_id", unique = true, nullable = false)
     private Long personaId;
     private String dni;
     private String nom;
     private String telefon;
 
-    @ManyToMany
-    @JoinTable(
-        name = "persona_llibre",
-        joinColumns = @JoinColumn(name = "personaId"),
-        inverseJoinColumns = @JoinColumn(name = "llibreId")
-    )
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "persona_llibre", joinColumns = @JoinColumn(name = "personaId", referencedColumnName = "persona_id"), inverseJoinColumns = @JoinColumn(name = "llibreId", referencedColumnName = "llibre_id"))
     private Set<Llibre> llibres;
+
+    public Persona() {
+    }
+
+    public Persona(String dni, String nom, String telefon) {
+        this.nom = nom;
+        this.dni = dni;
+        this.telefon = telefon;
+    }
 
     public Long getPersonaId() {
         return personaId;
@@ -60,15 +68,17 @@ public class Persona {
         this.llibres = llibres;
     }
 
+    public List<Object[]> queryLlibres() {
+        long id = this.getPersonaId();
+        return Manager.queryTable(
+                "select distinct l.* from persona_llibre pl join Llibre l on pl.personaId=l.llibre_id where pl.personaId="
+                        + id
+                        + ";");
+    }
+
     @Override
     public String toString() {
-        return "Persona{" +
-                "personaId=" + personaId +
-                ", dni='" + dni + '\'' +
-                ", nom='" + nom + '\'' +
-                ", telefon='" + telefon + '\'' +
-                ", llibres=" + (llibres != null ? llibres.size() : "0") +
-                '}';
+        // String str = Manager.tableToString(queryLlibres()).replaceAll("\n", " | ");
+        return personaId + ": " + nom + ", " + telefon + ", Llibres: " + llibres;
     }
 }
-

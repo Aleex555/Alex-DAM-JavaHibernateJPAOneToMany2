@@ -4,23 +4,36 @@ import javax.persistence.*;
 import java.util.Set;
 
 @Entity
+@Table(name = "Llibre")
 public class Llibre {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "llibre_id", unique = true, nullable = false)
     private Long llibreId;
-    private String nom;
-    private String editorial;
-    private Long idAutor;
 
-    @ManyToMany(mappedBy = "llibres")
+    @Column(name = "nom")
+    private String nom;
+
+    @Column(name = "editorial")
+    private String editorial;
+
+    @ManyToMany(mappedBy = "libros")
     private Set<Biblioteca> biblioteques;
 
     @ManyToOne
-    @JoinColumn(name = "autorId")
+    @JoinColumn(name = "autor_id")
     private Autor autor;
 
     @ManyToMany(mappedBy = "llibres")
     private Set<Persona> persones;
+
+    public Llibre() {
+    }
+
+    public Llibre(String nom, String editorial) {
+        this.nom = nom;
+        this.editorial = editorial;
+    }
 
     public Long getLlibreId() {
         return llibreId;
@@ -44,14 +57,6 @@ public class Llibre {
 
     public void setEditorial(String editorial) {
         this.editorial = editorial;
-    }
-
-    public Long getIdAutor() {
-        return idAutor;
-    }
-
-    public void setIdAutor(Long idAutor) {
-        this.idAutor = idAutor;
     }
 
     public Set<Biblioteca> getBiblioteques() {
@@ -80,12 +85,6 @@ public class Llibre {
 
     @Override
     public String toString() {
-        return "Llibre{" +
-                "llibreId=" + llibreId +
-                ", nom='" + nom + '\'' +
-                ", editorial='" + editorial + '\'' +
-                ", idAutor=" + idAutor +
-                ", autor=" + (autor != null ? autor.getNom() : "No Autor") +
-                '}';
+        return llibreId + ": " + editorial + ", " + nom;
     }
 }

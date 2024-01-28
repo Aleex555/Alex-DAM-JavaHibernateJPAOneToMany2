@@ -3,6 +3,7 @@ package com.project;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -34,21 +35,144 @@ public class Manager {
         factory.close();
     }
 
-    public static <T> T addEntity(T entity) {
+    public static Llibre addLlibre(String nom, String editorial) {
+        Session session = factory.openSession();
+        Transaction tx = null;
+        Llibre result = null;
+        try {
+            tx = session.beginTransaction();
+            result = new Llibre(nom, editorial);
+            session.save(result);
+            tx.commit();
+        } catch (HibernateException e) {
+            if (tx != null)
+                tx.rollback();
+            e.printStackTrace();
+            result = null;
+        } finally {
+            session.close();
+        }
+        return result;
+    }
+
+    public static Persona addPersona(String dni, String nom, String tel) {
+        Session session = factory.openSession();
+        Transaction tx = null;
+        Persona result = null;
+        try {
+            tx = session.beginTransaction();
+            result = new Persona(dni, nom, tel);
+            session.save(result);
+            tx.commit();
+        } catch (HibernateException e) {
+            if (tx != null)
+                tx.rollback();
+            e.printStackTrace();
+            result = null;
+        } finally {
+            session.close();
+        }
+        return result;
+    }
+
+    public static Biblioteca addBiblioteca(String nom, String ciutat) {
+        Session session = factory.openSession();
+        Transaction tx = null;
+        Biblioteca result = null;
+        try {
+            tx = session.beginTransaction();
+            result = new Biblioteca(nom, ciutat);
+            session.save(result);
+            tx.commit();
+        } catch (HibernateException e) {
+            if (tx != null)
+                tx.rollback();
+            e.printStackTrace();
+            result = null;
+        } finally {
+            session.close();
+        }
+        return result;
+    }
+
+    public static Autor addAutor(String nom) {
+        Session session = factory.openSession();
+        Transaction tx = null;
+        Autor result = null;
+        try {
+            tx = session.beginTransaction();
+            result = new Autor(nom);
+            session.save(result);
+            tx.commit();
+        } catch (HibernateException e) {
+            if (tx != null)
+                tx.rollback();
+            e.printStackTrace();
+            result = null;
+        } finally {
+            session.close();
+        }
+        return result;
+    }
+
+    public static void updateAutor(long autor_id, String name, Set<Llibre> Llibres) {
         Session session = factory.openSession();
         Transaction tx = null;
         try {
             tx = session.beginTransaction();
-            session.save(entity);
+            Autor obj = (Autor) session.get(Autor.class, autor_id);
+            obj.setNom(name);
+            obj.setLlibres(Llibres);
+            session.update(obj);
             tx.commit();
         } catch (HibernateException e) {
-            if (tx != null) tx.rollback();
+            if (tx != null)
+                tx.rollback();
             e.printStackTrace();
-            entity = null;
         } finally {
             session.close();
         }
-        return entity;
+    }
+
+    public static void updateBiblioteca(long bib_id, String name, String ciutat, Set<Llibre> Llibres) {
+        Session session = factory.openSession();
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            Biblioteca obj = (Biblioteca) session.get(Biblioteca.class, bib_id);
+            obj.setNom(name);
+            obj.setCiutat(ciutat);
+            obj.setLibros(Llibres);
+            session.update(obj);
+            tx.commit();
+        } catch (HibernateException e) {
+            if (tx != null)
+                tx.rollback();
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+    }
+
+    public static void updatePersona(long per_id, String dni, String nom, String tel, Set<Llibre> Llibres) {
+        Session session = factory.openSession();
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            Persona obj = (Persona) session.get(Persona.class, per_id);
+            obj.setNom(nom);
+            obj.setDni(dni);
+            obj.setTelefon(tel);
+            obj.setLlibres(Llibres);
+            session.update(obj);
+            tx.commit();
+        } catch (HibernateException e) {
+            if (tx != null)
+                tx.rollback();
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
     }
 
     public static <T> T getById(Class<? extends T> clazz, Serializable id) {
@@ -60,7 +184,8 @@ public class Manager {
             obj = clazz.cast(session.get(clazz, id));
             tx.commit();
         } catch (HibernateException e) {
-            if (tx != null) tx.rollback();
+            if (tx != null)
+                tx.rollback();
             e.printStackTrace();
         } finally {
             session.close();
@@ -76,7 +201,8 @@ public class Manager {
             session.update(entity);
             tx.commit();
         } catch (HibernateException e) {
-            if (tx != null) tx.rollback();
+            if (tx != null)
+                tx.rollback();
             e.printStackTrace();
         } finally {
             session.close();
@@ -92,7 +218,8 @@ public class Manager {
             session.delete(obj);
             tx.commit();
         } catch (HibernateException e) {
-            if (tx != null) tx.rollback();
+            if (tx != null)
+                tx.rollback();
             e.printStackTrace();
         } finally {
             session.close();
@@ -116,7 +243,8 @@ public class Manager {
             }
             tx.commit();
         } catch (HibernateException e) {
-            if (tx != null) tx.rollback();
+            if (tx != null)
+                tx.rollback();
             e.printStackTrace();
         } finally {
             session.close();
@@ -136,7 +264,7 @@ public class Manager {
         return txt.toString();
     }
 
-    public static void queryUpdate (String queryString) {
+    public static void queryUpdate(String queryString) {
         Session session = factory.openSession();
         Transaction tx = null;
         try {
@@ -145,14 +273,15 @@ public class Manager {
             query.executeUpdate();
             tx.commit();
         } catch (HibernateException e) {
-            if (tx!=null) tx.rollback();
-            e.printStackTrace(); 
+            if (tx != null)
+                tx.rollback();
+            e.printStackTrace();
         } finally {
-            session.close(); 
+            session.close();
         }
     }
 
-    public static List<Object[]> queryTable (String queryString) {
+    public static List<Object[]> queryTable(String queryString) {
         Session session = factory.openSession();
         Transaction tx = null;
         List<Object[]> result = null;
@@ -164,15 +293,16 @@ public class Manager {
             result = rows;
             tx.commit();
         } catch (HibernateException e) {
-            if (tx!=null) tx.rollback();
-            e.printStackTrace(); 
+            if (tx != null)
+                tx.rollback();
+            e.printStackTrace();
         } finally {
-            session.close(); 
+            session.close();
         }
         return result;
     }
 
-    public static String tableToString (List<Object[]> rows) {
+    public static String tableToString(List<Object[]> rows) {
         String txt = "";
         for (Object[] row : rows) {
             for (Object cell : row) {
@@ -184,7 +314,7 @@ public class Manager {
             txt += "\n";
         }
         if (txt.length() >= 2) {
-            txt =  txt.substring(0, txt.length() - 2);
+            txt = txt.substring(0, txt.length() - 2);
         }
         return txt;
     }
